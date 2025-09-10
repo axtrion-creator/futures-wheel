@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futures Wheel Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        #visualization {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+
+        .node.selected {
+            stroke: #ff6b6b;
+            stroke-width: 3px;
+        }
+
+        .node.highlighted {
+            stroke: #4ecdc4;
+            stroke-width: 2px;
+        }
+
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+            stroke-width: 2px;
+        }
+
+        .link.highlighted {
+            stroke: #4ecdc4;
+            stroke-opacity: 1;
+            stroke-width: 3px;
+        }
+
+        .link.custom {
+            stroke: #ff6b6b;
+            stroke-opacity: 0.8;
+            stroke-width: 3px;
+            stroke-dasharray: 5,5;
+        }
+
+        .link.custom.highlighted {
+            stroke: #ff6b6b;
+            stroke-opacity: 1;
+            stroke-width: 4px;
+        }
+
+        .node-label {
+            font-size: 9px;
+            font-weight: bold;
+            text-anchor: middle;
+            pointer-events: none;
+            fill: #333;
+        }
+
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .info-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-panel h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            user-select: none;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Futures Wheel Visualization</h1>
+        
+        <div class="controls">
+            <button class="btn" onclick="resetVisualization()">Reset View</button>
+            <button class="btn" onclick="centerView()">Center View</button>
+            <button class="btn" onclick="toggleLabels()">Toggle Labels</button>
+            <button class="btn" id="drawModeBtn" onclick="toggleDrawMode()">Enable Draw Mode</button>
+        </div>
+
+        <div id="visualization"></div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #95BAEB;"></div>
+                <span>Central Phenomenon</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #E8D541;"></div>
+                <span>First Order Impact</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #E84196;"></div>
+                <span>Second Order Impact</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #41D5E8;"></div>
+                <span>Third Order Impact</span>
+            </div>
+        </div>
+
+        <div class="info-panel" id="infoPanel">
+            <h3>Instructions</h3>
+            <p>Click on any node to explore its connected impacts. The visualization will highlight the selected node and all its downstream effects. Use the controls above to reset the view or toggle labels.</p>
+            <p><strong>Draw Mode:</strong> Enable draw mode to create custom connections between nodes. Click on two nodes to draw a connection between them.</p>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script src="futures-wheel.js"></script>
+</body>
+</html>
