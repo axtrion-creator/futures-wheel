@@ -524,7 +524,6 @@ function initVisualization() {
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended))
-        .on("click", nodeClicked)
         .on("click", handleNodeClick)
         .on("mouseover", showTooltip)
         .on("mouseout", hideTooltip)
@@ -684,13 +683,13 @@ function dragended(event, d) {
     }
 }
 
-// Handle node clicks for drawing mode
+// Handle node clicks for both drawing mode and normal highlighting
 function handleNodeClick(event, d) {
+    // Hide tooltip to prevent interference
+    hideTooltip();
+    
     if (drawMode) {
-        // Hide tooltip to prevent interference
-        hideTooltip();
-        event.stopPropagation(); // Prevent the normal nodeClicked from firing
-        
+        // Draw mode logic
         if (!firstSelectedNode) {
             // First node selected
             firstSelectedNode = d;
@@ -729,15 +728,27 @@ function handleNodeClick(event, d) {
             d3.select(event.target).classed("selected", false);
             updateInfoPanel({name: "Draw mode active. Click two nodes to create a connection.", level: -1});
         }
+    } else {
+        // Normal highlighting mode - call the original nodeClicked logic
+        nodeClicked(event, d);
     }
 }
 
 // Node click handler
 function nodeClicked(event, d) {
-    if (drawMode) return; // Don't do normal highlighting in draw mode
-    
     // Hide tooltip to prevent interference
     hideTooltip();
+    
+    // Check if clicking the same node (deselection)
+    if (selectedNode && selectedNode.id === d.id) {
+        // Deselect everything
+        nodes.classed("selected", false);
+        nodes.classed("highlighted", false);
+        links_g.classed("highlighted", false);
+        selectedNode = null;
+        updateInfoPanel({name: "Click on any node to explore its connected impacts.", level: -1});
+        return;
+    }
     
     // Remove previous selection
     nodes.classed("selected", false);
@@ -748,36 +759,54 @@ function nodeClicked(event, d) {
     d3.select(event.target).classed("selected", true);
     selectedNode = d;
 
-    // Find and highlight directly connected nodes and links
-    const connectedNodes = new Set();
-    connectedNodes.add(d.id);
+    // Find the complete chain (all ancestors and descendants)
+    const chainNodes = new Set();
+    chainNodes.add(d.id);
 
-    // Find all links connected to this node
-    const allLinks = [...links, ...customLinks];
-    allLinks.forEach(link => {
-        const sourceId = link.source.id || link.source;
-        const targetId = link.target.id || link.target;
-        
-        if (sourceId === d.id) {
-            // This is an outgoing link
-            connectedNodes.add(targetId);
-        } else if (targetId === d.id) {
-            // This is an incoming link
-            connectedNodes.add(sourceId);
-        }
-    });
+    // Find all ancestors (upstream to center)
+    function findAncestors(nodeId) {
+        links.forEach(link => {
+            const sourceId = link.source.id || link.source;
+            const targetId = link.target.id || link.target;
+            if (targetId === nodeId) {
+                chainNodes.add(sourceId);
+                findAncestors(sourceId);
+            }
+        });
+    }
 
-    // Highlight connected nodes
-    nodes.filter(node => connectedNodes.has(node.id))
-        .classed("highlighted", true);
+    // Find all descendants (downstream from center)
+    function findDescendants(nodeId) {
+        links.forEach(link => {
+            const sourceId = link.source.id || link.source;
+            const targetId = link.target.id || link.target;
+            if (sourceId === nodeId) {
+                chainNodes.add(targetId);
+                findDescendants(targetId);
+            }
+        });
+    }
 
-    // Highlight connected links
-    links_g.filter(link => {
+    // Find complete chain
+    findAncestors(d.id);
+    findDescendants(d.id);
+
+    console.log("Complete chain nodes:", Array.from(chainNodes));
+
+    // Highlight all nodes in the chain
+    const highlightedNodes = nodes.filter(node => chainNodes.has(node.id));
+    console.log("Highlighting nodes count:", highlightedNodes.size());
+    highlightedNodes.classed("highlighted", true);
+
+    // Highlight all links between chain nodes
+    const highlightedLinks = links_g.filter(link => {
         const linkData = link.__data__;
         const sourceId = linkData.source.id || linkData.source;
         const targetId = linkData.target.id || linkData.target;
-        return sourceId === d.id || targetId === d.id;
-    }).classed("highlighted", true);
+        return chainNodes.has(sourceId) && chainNodes.has(targetId);
+    });
+    console.log("Highlighting links count:", highlightedLinks.size());
+    highlightedLinks.classed("highlighted", true);
 
     // Update info panel
     updateInfoPanel(d);
