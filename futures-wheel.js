@@ -481,9 +481,9 @@ function initVisualization() {
         .force("link", d3.forceLink(links).id(d => d.id).distance(d => {
             // Shorter distances for first-order nodes
             if (d.source.id === "center" || d.target.id === "center") {
-                return 100; // Distance to first ring
+                return 150; // Distance to first ring (increased from 100)
             }
-            return 120; // Increased distance between other levels
+            return 180; // Increased distance between other levels (increased from 120)
         }))
         .force("charge", d3.forceManyBody().strength(d => {
             // Strong repulsion to prevent overlap
@@ -491,13 +491,13 @@ function initVisualization() {
             return -500; // All other nodes
         }))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision", d3.forceCollide().radius(35))
+        .force("collision", d3.forceCollide().radius(70))
         .force("radial", d3.forceRadial(d => {
             // Fixed radial distances for each level
             if (d.level === 0) return 0;
-            if (d.level === 1) return 120;
-            if (d.level === 2) return 250;
-            return 380;
+            if (d.level === 1) return 180; // Increased from 120
+            if (d.level === 2) return 350; // Increased from 250
+            return 500; // Increased from 380
         }, width / 2, height / 2).strength(0.8))
         .force("angular", d3.forceRadial(0, width / 2, height / 2).strength(0.1));
 
@@ -611,7 +611,7 @@ function positionNodesRadially() {
         }
         
         // Calculate radius for this level
-        const radius = levelNum === 1 ? 120 : levelNum === 2 ? 250 : 380;
+        const radius = levelNum === 1 ? 180 : levelNum === 2 ? 350 : 500;
         
         // Distribute nodes evenly around the circle
         levelNodes.forEach((node, index) => {
@@ -645,11 +645,11 @@ function positionNodesRadially() {
 // Helper functions
 function getNodeRadius(level) {
     switch(level) {
-        case 0: return 20; // Center
-        case 1: return 15; // First order
-        case 2: return 12; // Second order
-        case 3: return 10; // Third order
-        default: return 8;
+        case 0: return 60; // Center (20 * 3)
+        case 1: return 45; // First order (15 * 3)
+        case 2: return 36; // Second order (12 * 3)
+        case 3: return 30; // Third order (10 * 3)
+        default: return 24; // (8 * 3)
     }
 }
 
