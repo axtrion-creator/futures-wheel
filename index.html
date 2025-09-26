@@ -51,10 +51,16 @@
         .btn:hover {
             background: #5a6fd8;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
         .btn:active {
             transform: translateY(0);
+        }
+
+        .btn:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
         }
 
         #visualization {
@@ -68,6 +74,12 @@
         .node {
             cursor: pointer;
             transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .node:hover {
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            transform: scale(1.05);
         }
 
 
@@ -175,9 +187,7 @@
         
         <div class="controls">
             <button class="btn" onclick="resetVisualization()">Reset View</button>
-            <button class="btn" onclick="centerView()">Center View</button>
-            <button class="btn" onclick="toggleLabels()">Toggle Labels</button>
-            <button class="btn" id="drawModeBtn" onclick="toggleDrawMode()">Enable Draw Mode</button>
+            <button class="btn" onclick="exportVisualization()">Export Image</button>
         </div>
 
         <div id="visualization"></div>
@@ -203,8 +213,8 @@
 
         <div class="info-panel" id="infoPanel">
             <h3>Instructions</h3>
-            <p>Click on any node to explore its connected impacts. The visualization will highlight the selected node and all its downstream effects. Use the controls above to reset the view or toggle labels.</p>
-            <p><strong>Draw Mode:</strong> Enable draw mode to create custom connections between nodes. Click on two nodes to draw a connection between them.</p>
+            <p>Click on any node to explore its connected impacts. The visualization will highlight the selected node and all its downstream effects. Use the controls above to reset the view, center the visualization, or toggle labels.</p>
+            <p><strong>Navigation:</strong> Drag to pan, scroll to zoom, or use the control buttons for quick navigation.</p>
         </div>
     </div>
 

@@ -444,16 +444,23 @@ let svg, g, simulation;
 let nodes, links_g;
 let selectedNode = null;
 let showLabels = true;
-let drawMode = false;
-let firstSelectedNode = null;
-let customLinks = [];
 let tooltip;
+let originalNodePositions = new Map();
 
 // Initialize the visualization
 function initVisualization() {
-    const container = d3.select("#visualization");
-    const width = container.node().offsetWidth;
-    const height = container.node().offsetHeight;
+    try {
+        const container = d3.select("#visualization");
+        if (container.empty()) {
+            throw new Error("Visualization container not found");
+        }
+        
+        const width = container.node().offsetWidth;
+        const height = container.node().offsetHeight;
+        
+        if (width === 0 || height === 0) {
+            throw new Error("Container has no dimensions");
+        }
 
     // Create SVG
     svg = container
@@ -476,30 +483,35 @@ function initVisualization() {
     // Create tooltip
     tooltip = d3.select("#tooltip");
 
-    // Create force simulation with structured radial layout
+    // Create force simulation with improved parameters
     simulation = d3.forceSimulation(futuresWheelData.nodes)
         .force("link", d3.forceLink(links).id(d => d.id).distance(d => {
-            // Shorter distances for first-order nodes
+            // Optimized distances for better layout
             if (d.source.id === "center" || d.target.id === "center") {
-                return 150; // Distance to first ring (increased from 100)
+                return 120; // Distance to first ring
             }
-            return 180; // Increased distance between other levels (increased from 120)
-        }))
+            return 100; // Distance between other levels
+        }).strength(0.3))
         .force("charge", d3.forceManyBody().strength(d => {
-            // Strong repulsion to prevent overlap
-            if (d.level === 0) return -2000; // Center node
-            return -500; // All other nodes
+            // Balanced repulsion to prevent overlap while allowing natural movement
+            if (d.level === 0) return -1500; // Center node
+            return -300; // All other nodes
         }))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision", d3.forceCollide().radius(70))
+        .force("collision", d3.forceCollide().radius(d => {
+            // Dynamic collision radius based on node level
+            return getNodeRadius(d.level) + 10;
+        }))
         .force("radial", d3.forceRadial(d => {
             // Fixed radial distances for each level
             if (d.level === 0) return 0;
-            if (d.level === 1) return 180; // Increased from 120
-            if (d.level === 2) return 350; // Increased from 250
-            return 500; // Increased from 380
-        }, width / 2, height / 2).strength(0.8))
-        .force("angular", d3.forceRadial(0, width / 2, height / 2).strength(0.1));
+            if (d.level === 1) return 150;
+            if (d.level === 2) return 280;
+            return 400;
+        }, width / 2, height / 2).strength(0.6))
+        .force("angular", d3.forceRadial(0, width / 2, height / 2).strength(0.05))
+        .alphaDecay(0.02)
+        .velocityDecay(0.4);
 
     // Create links
     links_g = g.append("g")
@@ -578,18 +590,55 @@ function initVisualization() {
     // Position center node
     const centerNode = futuresWheelData.nodes.find(d => d.id === "center");
     if (centerNode) {
+        centerNode.x = width / 2;
+        centerNode.y = height / 2;
         centerNode.fx = width / 2;
         centerNode.fy = height / 2;
     }
 
     // Position nodes in structured radial layout
     positionNodesRadially();
+    
+    // Store original positions for reset functionality
+    storeOriginalPositions();
+    
+    // Set initial zoom to center the visualization
+    setTimeout(() => {
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const scale = 0.8;
+        const translateX = centerX - 400;
+        const translateY = centerY - 300;
+        
+        svg.call(
+            d3.zoom().transform,
+            d3.zoomIdentity.translate(translateX, translateY).scale(scale)
+        );
+    }, 100);
+    
+    } catch (error) {
+        console.error("Error initializing visualization:", error);
+        // Show user-friendly error message
+        const container = d3.select("#visualization");
+        container.html(`
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; font-size: 18px;">
+                <div style="text-align: center;">
+                    <h3>Visualization Error</h3>
+                    <p>Unable to load the futures wheel visualization.</p>
+                    <p>Please refresh the page to try again.</p>
+                </div>
+            </div>
+        `);
+    }
 }
 
 // Position nodes in structured radial layout
 function positionNodesRadially() {
-    const centerX = 400; // Approximate center
-    const centerY = 300;
+    const container = d3.select("#visualization");
+    const width = container.node().offsetWidth;
+    const height = container.node().offsetHeight;
+    const centerX = width / 2;
+    const centerY = height / 2;
     
     // Group nodes by level
     const nodesByLevel = {};
@@ -606,12 +655,17 @@ function positionNodesRadially() {
         const levelNum = parseInt(level);
         
         if (levelNum === 0) {
-            // Center node - already positioned
+            // Center node - position at center
+            const centerNode = levelNodes[0];
+            centerNode.x = centerX;
+            centerNode.y = centerY;
+            centerNode.fx = centerX;
+            centerNode.fy = centerY;
             return;
         }
         
-        // Calculate radius for this level
-        const radius = levelNum === 1 ? 180 : levelNum === 2 ? 350 : 500;
+        // Calculate radius for this level (matching simulation parameters)
+        const radius = levelNum === 1 ? 150 : levelNum === 2 ? 280 : 400;
         
         // Distribute nodes evenly around the circle
         levelNodes.forEach((node, index) => {
@@ -623,7 +677,7 @@ function positionNodesRadially() {
             node.x = x;
             node.y = y;
             
-            // For first few iterations, fix position to establish layout
+            // For first order nodes, fix position to establish proper layout
             if (levelNum === 1) {
                 node.fx = x;
                 node.fy = y;
@@ -631,7 +685,7 @@ function positionNodesRadially() {
         });
     });
     
-    // After a short delay, release the fixed positions to allow natural movement
+    // After a delay, release the fixed positions to allow natural movement
     setTimeout(() => {
         futuresWheelData.nodes.forEach(node => {
             if (node.id !== "center") {
@@ -639,7 +693,19 @@ function positionNodesRadially() {
                 node.fy = null;
             }
         });
-    }, 2000);
+    }, 3000);
+}
+
+// Store original positions for reset functionality
+function storeOriginalPositions() {
+    futuresWheelData.nodes.forEach(node => {
+        originalNodePositions.set(node.id, {
+            x: node.x,
+            y: node.y,
+            fx: node.fx,
+            fy: node.fy
+        });
+    });
 }
 
 // Helper functions
@@ -683,55 +749,13 @@ function dragended(event, d) {
     }
 }
 
-// Handle node clicks for both drawing mode and normal highlighting
+// Handle node clicks for highlighting
 function handleNodeClick(event, d) {
     // Hide tooltip to prevent interference
     hideTooltip();
     
-    if (drawMode) {
-        // Draw mode logic
-        if (!firstSelectedNode) {
-            // First node selected
-            firstSelectedNode = d;
-            d3.select(event.target).classed("selected", true);
-            updateInfoPanel({name: `Selected: ${d.name}. Click another node to create a connection.`, level: -1});
-        } else if (firstSelectedNode.id !== d.id) {
-            // Second node selected - create connection
-            const newLink = {
-                source: firstSelectedNode.id,
-                target: d.id,
-                custom: true
-            };
-            
-            // Check if connection already exists
-            const exists = [...links, ...customLinks].some(link => 
-                (link.source.id === firstSelectedNode.id && link.target.id === d.id) ||
-                (link.source.id === d.id && link.target.id === firstSelectedNode.id) ||
-                (link.source === firstSelectedNode.id && link.target === d.id) ||
-                (link.source === d.id && link.target === firstSelectedNode.id)
-            );
-            
-            if (!exists) {
-                customLinks.push(newLink);
-                updateLinks();
-                updateInfoPanel({name: `Connection created between ${firstSelectedNode.name} and ${d.name}`, level: -1});
-            } else {
-                updateInfoPanel({name: "Connection already exists between these nodes", level: -1});
-            }
-            
-            // Reset selection
-            nodes.classed("selected", false);
-            firstSelectedNode = null;
-        } else {
-            // Same node clicked - deselect
-            firstSelectedNode = null;
-            d3.select(event.target).classed("selected", false);
-            updateInfoPanel({name: "Draw mode active. Click two nodes to create a connection.", level: -1});
-        }
-    } else {
-        // Normal highlighting mode - call the original nodeClicked logic
-        nodeClicked(event, d);
-    }
+    // Call the nodeClicked logic for highlighting
+    nodeClicked(event, d);
 }
 
 // Node click handler
@@ -812,20 +836,18 @@ function nodeClicked(event, d) {
     updateInfoPanel(d);
 }
 
-// Update links visualization
+// Update links visualization (simplified - no custom links)
 function updateLinks() {
-    const allLinks = [...links, ...customLinks];
-    
     links_g = g.select(".links")
         .selectAll("line")
-        .data(allLinks, d => `${d.source.id || d.source}-${d.target.id || d.target}`);
+        .data(links);
     
     // Remove old links
     links_g.exit().remove();
     
     // Add new links
     const newLinks = links_g.enter().append("line")
-        .attr("class", d => d.custom ? "link custom" : "link");
+        .attr("class", "link");
     
     // Update all links
     links_g = links_g.merge(newLinks);
@@ -837,10 +859,7 @@ function updateInfoPanel(node) {
     
     let content = `<h3>${node.name}</h3>`;
     
-    if (node.level === -1) {
-        // Special case for draw mode messages
-        content = `<h3>${node.name}</h3>`;
-    } else if (node.level === 0) {
+    if (node.level === 0) {
         content += `<p><strong>Central Phenomenon:</strong> This is the main issue that triggers all other impacts.</p>`;
     } else {
         content += `<p><strong>Level ${node.level} Impact:</strong> `;
@@ -856,8 +875,7 @@ function updateInfoPanel(node) {
 
     // Find connected nodes (both upstream and downstream)
     const connectedNodes = [];
-    const allLinks = [...links, ...customLinks];
-    allLinks.forEach(link => {
+    links.forEach(link => {
         if (link.source.id === node.id || link.source === node.id) {
             const targetNode = futuresWheelData.nodes.find(n => n.id === (link.target.id || link.target));
             if (targetNode) {
@@ -903,41 +921,104 @@ function resetVisualization() {
     nodes.classed("highlighted", false);
     links_g.classed("highlighted", false);
     selectedNode = null;
-    firstSelectedNode = null;
-    drawMode = false;
-    customLinks = [];
-    
-    // Update button text
-    d3.select("#drawModeBtn").text("Enable Draw Mode");
 
     // Reset info panel
     d3.select("#infoPanel").html(`
         <h3>Instructions</h3>
         <p>Click on any node to explore its connected impacts. The visualization will highlight the selected node and all its downstream effects. Use the controls above to reset the view or toggle labels.</p>
-        <p><strong>Draw Mode:</strong> Enable draw mode to create custom connections between nodes. Click on two nodes to draw a connection between them.</p>
+        <p><strong>Navigation:</strong> Drag to pan, scroll to zoom, or use the control buttons for quick navigation.</p>
     `);
 
-    // Reset zoom
-    svg.transition().duration(750).call(
-        d3.zoom().transform,
-        d3.zoomIdentity
-    );
-    
-    // Update links to remove custom ones
-    updateLinks();
-}
-
-function centerView() {
+    // Reset zoom to center the central phenomenon
     const container = d3.select("#visualization");
     const width = container.node().offsetWidth;
     const height = container.node().offsetHeight;
+    const centerX = width / 2;
+    const centerY = height / 2;
     
-    // Center the view on the visualization
+    // Calculate the transform to center the central phenomenon
+    const scale = 0.8; // Slightly zoomed out to show the full wheel
+    const translateX = centerX - 400; // 400 is the center of the visualization
+    const translateY = centerY - 300; // 300 is the center of the visualization
+    
     svg.transition().duration(750).call(
         d3.zoom().transform,
-        d3.zoomIdentity.translate(width/2 - 400, height/2 - 300).scale(0.7)
+        d3.zoomIdentity.translate(translateX, translateY).scale(scale)
     );
+    
+    // Reset node positions to original layout
+    resetNodePositions();
+    
+    // Restart simulation
+    simulation.alpha(0.3).restart();
 }
+
+// Reset node positions to proper radial layout
+function resetNodePositions() {
+    const container = d3.select("#visualization");
+    const width = container.node().offsetWidth;
+    const height = container.node().offsetHeight;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    // Group nodes by level
+    const nodesByLevel = {};
+    futuresWheelData.nodes.forEach(node => {
+        if (!nodesByLevel[node.level]) {
+            nodesByLevel[node.level] = [];
+        }
+        nodesByLevel[node.level].push(node);
+    });
+    
+    // Position nodes in each level
+    Object.keys(nodesByLevel).forEach(level => {
+        const levelNodes = nodesByLevel[level];
+        const levelNum = parseInt(level);
+        
+        if (levelNum === 0) {
+            // Center node - position at center
+            const centerNode = levelNodes[0];
+            centerNode.x = centerX;
+            centerNode.y = centerY;
+            centerNode.fx = centerX;
+            centerNode.fy = centerY;
+        } else {
+            // Calculate radius for this level
+            const radius = levelNum === 1 ? 150 : levelNum === 2 ? 280 : 400;
+            
+            // Distribute nodes evenly around the circle
+            levelNodes.forEach((node, index) => {
+                const angle = (2 * Math.PI * index) / levelNodes.length;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                
+                // Set position
+                node.x = x;
+                node.y = y;
+                
+                // For first order nodes, fix position to establish proper layout
+                if (levelNum === 1) {
+                    node.fx = x;
+                    node.fy = y;
+                } else {
+                    node.fx = null;
+                    node.fy = null;
+                }
+            });
+        }
+    });
+    
+    // After a delay, release the fixed positions for first order nodes
+    setTimeout(() => {
+        futuresWheelData.nodes.forEach(node => {
+            if (node.id !== "center") {
+                node.fx = null;
+                node.fy = null;
+            }
+        });
+    }, 2000);
+}
+
 
 function toggleLabels() {
     showLabels = !showLabels;
@@ -945,23 +1026,38 @@ function toggleLabels() {
         .style("display", showLabels ? "block" : "none");
 }
 
-function toggleDrawMode() {
-    drawMode = !drawMode;
-    firstSelectedNode = null;
-    nodes.classed("selected", false);
+function exportVisualization() {
+    // Create a temporary canvas to export the visualization
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const width = svg.attr('width');
+    const height = svg.attr('height');
     
-    const btn = d3.select("#drawModeBtn");
-    if (drawMode) {
-        btn.text("Disable Draw Mode").style("background", "#ff6b6b");
-        updateInfoPanel({name: "Draw mode active. Click two nodes to create a connection.", level: -1});
-    } else {
-        btn.text("Enable Draw Mode").style("background", "#667eea");
-        updateInfoPanel({name: "Draw mode disabled. Click on any node to explore its connected impacts.", level: -1});
-    }
+    canvas.width = width;
+    canvas.height = height;
+    
+    // Convert SVG to canvas
+    const svgData = new XMLSerializer().serializeToString(svg.node());
+    const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+    const svgUrl = URL.createObjectURL(svgBlob);
+    
+    const img = new Image();
+    img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(svgUrl);
+        
+        // Download the image
+        const link = document.createElement('a');
+        link.download = 'futures-wheel-visualization.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    };
+    img.src = svgUrl;
 }
 
-// Tooltip functions
+// Tooltip functions with debouncing
 let tooltipTimeout;
+let isTooltipVisible = false;
 
 function showTooltip(event, d) {
     // Clear any existing timeout
@@ -971,11 +1067,14 @@ function showTooltip(event, d) {
     
     // Add a small delay to prevent interference with clicks
     tooltipTimeout = setTimeout(() => {
-        const fullText = d.fullName || d.name;
-        tooltip
-            .html(fullText)
-            .classed("show", true);
-    }, 300);
+        if (!isTooltipVisible) {
+            const fullText = d.fullName || d.name;
+            tooltip
+                .html(fullText)
+                .classed("show", true);
+            isTooltipVisible = true;
+        }
+    }, 200);
 }
 
 function hideTooltip() {
@@ -985,6 +1084,7 @@ function hideTooltip() {
         tooltipTimeout = null;
     }
     tooltip.classed("show", false);
+    isTooltipVisible = false;
 }
 
 function moveTooltip(event) {
@@ -997,4 +1097,21 @@ function moveTooltip(event) {
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     initVisualization();
+    
+    // Handle window resize
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            if (svg && g) {
+                const container = d3.select("#visualization");
+                const width = container.node().offsetWidth;
+                const height = container.node().offsetHeight;
+                
+                svg.attr("width", width).attr("height", height);
+                simulation.force("center", d3.forceCenter(width / 2, height / 2));
+                simulation.alpha(0.1).restart();
+            }
+        }, 250);
+    });
 });
