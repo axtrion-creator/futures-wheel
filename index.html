@@ -179,6 +179,80 @@
         .tooltip.show {
             opacity: 1;
         }
+
+        /* Welcome Overlay Styles */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+        }
+
+        .welcome-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            text-align: center;
+            margin: 20px;
+            animation: welcomeSlideIn 0.5s ease-out;
+        }
+
+        .welcome-content h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+            font-weight: 300;
+        }
+
+        .welcome-content p {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .welcome-close-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .welcome-close-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .welcome-overlay.hidden {
+            display: none !important;
+        }
+
+        @keyframes welcomeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -219,6 +293,15 @@
     </div>
 
     <div class="tooltip" id="tooltip"></div>
+
+    <!-- Welcome Overlay -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-content">
+            <h2>Tervetuloa!</h2>
+            <p>Tervetuloa tutkailemaan terveydenhuollon robotiikkaa koskevaa tulevaisuuspyörää. Osassa palleroista tekstiä on jouduttu lyhentämään - pitämällä hiirtä palleron päällä näet koko lauseen.</p>
+            <button class="btn welcome-close-btn" onclick="closeWelcomeOverlay()">Aloita tutkiminen</button>
+        </div>
+    </div>
 
     <script src="futures-wheel.js"></script>
 </body>

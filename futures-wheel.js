@@ -1094,9 +1094,27 @@ function moveTooltip(event) {
         .style("top", (y - 10) + "px");
 }
 
+// Welcome overlay functions
+function closeWelcomeOverlay() {
+    const overlay = document.getElementById('welcomeOverlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.style.display = 'none';
+        
+        // Start the visualization after closing the overlay
+        setTimeout(() => {
+            initVisualization();
+        }, 300);
+    }
+}
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    initVisualization();
+    // Show welcome overlay first, don't initialize visualization yet
+    const overlay = document.getElementById('welcomeOverlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
     
     // Handle window resize
     let resizeTimeout;
