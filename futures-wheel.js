@@ -440,7 +440,7 @@ futuresWheelData.nodes.forEach(node => {
 });
 
 // Visualization variables
-let svg, g, simulation;
+let svg, g;
 let nodes, links_g;
 let selectedNode = null;
 let showLabels = true;
@@ -483,45 +483,32 @@ function initVisualization() {
     // Create tooltip
     tooltip = d3.select("#tooltip");
 
-    // Create force simulation with improved parameters
-    simulation = d3.forceSimulation(futuresWheelData.nodes)
-        .force("link", d3.forceLink(links).id(d => d.id).distance(d => {
-            // Optimized distances for better layout
-            if (d.source.id === "center" || d.target.id === "center") {
-                return 120; // Distance to first ring
-            }
-            return 100; // Distance between other levels
-        }).strength(0.3))
-        .force("charge", d3.forceManyBody().strength(d => {
-            // Balanced repulsion to prevent overlap while allowing natural movement
-            if (d.level === 0) return -1500; // Center node
-            return -300; // All other nodes
-        }))
-        .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision", d3.forceCollide().radius(d => {
-            // Dynamic collision radius based on node level
-            return getNodeRadius(d.level) + 10;
-        }))
-        .force("radial", d3.forceRadial(d => {
-            // Fixed radial distances for each level
-            if (d.level === 0) return 0;
-            if (d.level === 1) return 150;
-            if (d.level === 2) return 280;
-            return 400;
-        }, width / 2, height / 2).strength(0.6))
-        .force("angular", d3.forceRadial(0, width / 2, height / 2).strength(0.05))
-        .alphaDecay(0.02)
-        .velocityDecay(0.4);
+    // Position all nodes in structured radial layout (static positioning)
+    positionNodesRadially();
+    
+    // Create a lookup map for nodes by id (needed for link rendering)
+    const nodeMap = {};
+    futuresWheelData.nodes.forEach(node => nodeMap[node.id] = node);
+    
+    // Update link data to have actual node references
+    links.forEach(link => {
+        link.source = nodeMap[link.source] || link.source;
+        link.target = nodeMap[link.target] || link.target;
+    });
 
-    // Create links
+    // Create links (static, no animation)
     links_g = g.append("g")
         .attr("class", "links")
         .selectAll("line")
         .data(links)
         .enter().append("line")
-        .attr("class", "link");
+        .attr("class", "link")
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
 
-    // Create nodes
+    // Create nodes (static, no animation)
     nodes = g.append("g")
         .attr("class", "nodes")
         .selectAll("circle")
@@ -532,22 +519,21 @@ function initVisualization() {
         .attr("fill", d => getNodeColor(d.level))
         .attr("stroke", "#fff")
         .attr("stroke-width", 2)
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended))
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
         .on("click", handleNodeClick)
         .on("mouseover", showTooltip)
         .on("mouseout", hideTooltip)
         .on("mousemove", moveTooltip);
 
-    // Add labels
+    // Add labels (static, no animation)
     const labels = g.append("g")
         .attr("class", "labels")
         .selectAll("g")
         .data(futuresWheelData.nodes)
         .enter().append("g")
         .attr("class", "node-label-group")
+        .attr("transform", d => `translate(${d.x}, ${d.y + 5})`)
         .style("display", showLabels ? "block" : "none");
 
     // Add text elements for each label
@@ -570,37 +556,11 @@ function initVisualization() {
                 .text(secondLine);
         }
     });
-
-    // Update positions on simulation tick
-    simulation.on("tick", () => {
-        links_g
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
-
-        nodes
-            .attr("cx", d => d.x)
-            .attr("cy", d => d.y);
-
-        labels
-            .attr("transform", d => `translate(${d.x}, ${d.y + 5})`);
-    });
-
-    // Position center node
-    const centerNode = futuresWheelData.nodes.find(d => d.id === "center");
-    if (centerNode) {
-        centerNode.x = width / 2;
-        centerNode.y = height / 2;
-        centerNode.fx = width / 2;
-        centerNode.fy = height / 2;
-    }
-
-    // Position nodes in structured radial layout
-    positionNodesRadially();
     
     // Store original positions for reset functionality
     storeOriginalPositions();
+    
+    console.log("Visualization rendered - all nodes are static");
     
     // Set initial zoom to center the visualization
     setTimeout(() => {
@@ -659,41 +619,19 @@ function positionNodesRadially() {
             const centerNode = levelNodes[0];
             centerNode.x = centerX;
             centerNode.y = centerY;
-            centerNode.fx = centerX;
-            centerNode.fy = centerY;
             return;
         }
         
-        // Calculate radius for this level (matching simulation parameters)
+        // Calculate radius for this level
         const radius = levelNum === 1 ? 150 : levelNum === 2 ? 280 : 400;
         
         // Distribute nodes evenly around the circle
         levelNodes.forEach((node, index) => {
             const angle = (2 * Math.PI * index) / levelNodes.length;
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
-            
-            // Set initial position
-            node.x = x;
-            node.y = y;
-            
-            // For first order nodes, fix position to establish proper layout
-            if (levelNum === 1) {
-                node.fx = x;
-                node.fy = y;
-            }
+            node.x = centerX + radius * Math.cos(angle);
+            node.y = centerY + radius * Math.sin(angle);
         });
     });
-    
-    // After a delay, release the fixed positions to allow natural movement
-    setTimeout(() => {
-        futuresWheelData.nodes.forEach(node => {
-            if (node.id !== "center") {
-                node.fx = null;
-                node.fy = null;
-            }
-        });
-    }, 3000);
 }
 
 // Store original positions for reset functionality
@@ -726,26 +664,6 @@ function getNodeColor(level) {
         case 2: return "#E84196"; // Second order - pink
         case 3: return "#41D5E8"; // Third order - cyan
         default: return "#ddd";
-    }
-}
-
-// Drag functions
-function dragstarted(event, d) {
-    if (!event.active) simulation.alphaTarget(0.3).restart();
-    d.fx = d.x;
-    d.fy = d.y;
-}
-
-function dragged(event, d) {
-    d.fx = event.x;
-    d.fy = event.y;
-}
-
-function dragended(event, d) {
-    if (!event.active) simulation.alphaTarget(0);
-    if (d.id !== "center") {
-        d.fx = null;
-        d.fy = null;
     }
 }
 
@@ -948,9 +866,6 @@ function resetVisualization() {
     
     // Reset node positions to original layout
     resetNodePositions();
-    
-    // Restart simulation
-    simulation.alpha(0.3).restart();
 }
 
 // Reset node positions to proper radial layout
@@ -980,8 +895,6 @@ function resetNodePositions() {
             const centerNode = levelNodes[0];
             centerNode.x = centerX;
             centerNode.y = centerY;
-            centerNode.fx = centerX;
-            centerNode.fy = centerY;
         } else {
             // Calculate radius for this level
             const radius = levelNum === 1 ? 150 : levelNum === 2 ? 280 : 400;
@@ -989,34 +902,31 @@ function resetNodePositions() {
             // Distribute nodes evenly around the circle
             levelNodes.forEach((node, index) => {
                 const angle = (2 * Math.PI * index) / levelNodes.length;
-                const x = centerX + radius * Math.cos(angle);
-                const y = centerY + radius * Math.sin(angle);
-                
-                // Set position
-                node.x = x;
-                node.y = y;
-                
-                // For first order nodes, fix position to establish proper layout
-                if (levelNum === 1) {
-                    node.fx = x;
-                    node.fy = y;
-                } else {
-                    node.fx = null;
-                    node.fy = null;
-                }
+                node.x = centerX + radius * Math.cos(angle);
+                node.y = centerY + radius * Math.sin(angle);
             });
         }
     });
     
-    // After a delay, release the fixed positions for first order nodes
-    setTimeout(() => {
-        futuresWheelData.nodes.forEach(node => {
-            if (node.id !== "center") {
-                node.fx = null;
-                node.fy = null;
-            }
-        });
-    }, 2000);
+    // Update visual positions immediately
+    nodes
+        .transition()
+        .duration(750)
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+    
+    links_g
+        .transition()
+        .duration(750)
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+    
+    d3.selectAll(".node-label-group")
+        .transition()
+        .duration(750)
+        .attr("transform", d => `translate(${d.x}, ${d.y + 5})`);
 }
 
 
@@ -1127,8 +1037,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 const height = container.node().offsetHeight;
                 
                 svg.attr("width", width).attr("height", height);
-                simulation.force("center", d3.forceCenter(width / 2, height / 2));
-                simulation.alpha(0.1).restart();
+                
+                // Reposition nodes for new dimensions
+                positionNodesRadially();
+                
+                // Update visual positions immediately
+                nodes
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y);
+                
+                links_g
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+                
+                d3.selectAll(".node-label-group")
+                    .attr("transform", d => `translate(${d.x}, ${d.y + 5})`);
             }
         }, 250);
     });

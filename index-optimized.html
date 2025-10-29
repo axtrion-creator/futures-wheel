@@ -15,12 +15,80 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             padding: 30px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+        }
+
+        .visualization-container {
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar-content h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: white;
+        }
+
+        .level-badge.level-0 {
+            background: #95BAEB;
+        }
+
+        .level-badge.level-1 {
+            background: #E8D541;
+            color: #333;
+        }
+
+        .level-badge.level-2 {
+            background: #E84196;
+        }
+
+        .level-badge.level-3 {
+            background: #41D5E8;
+            color: #333;
+        }
+
+        .description h4 {
+            margin: 15px 0 8px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .description p {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
         }
 
         h1 {
@@ -56,21 +124,24 @@
 
         #visualization {
             width: 100%;
-            height: 800px;
+            height: 1000px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             background: #fafafa;
+            position: relative;
         }
 
         .node.selected {
-            stroke: #ff6b6b;
-            stroke-width: 3px;
+            stroke: #ff6b6b !important;
+            stroke-width: 4px !important;
+        }
+        
+        circle {
+            transition: all 0.2s ease;
         }
 
-        .link {
-            stroke: #999;
-            stroke-opacity: 0.6;
-            stroke-width: 2px;
+        line {
+            stroke-linecap: round;
         }
 
         .legend {
@@ -127,35 +198,45 @@
     <div class="container">
         <h1>Futures Wheel Visualization - Optimized</h1>
         
-        <div id="visualization"></div>
+        <div class="main-content">
+            <div class="visualization-container">
+                <div id="visualization"></div>
 
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background: #95BAEB;"></div>
-                <span>Central Phenomenon</span>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #95BAEB;"></div>
+                        <span>Central Phenomenon</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #E8D541;"></div>
+                        <span>First Order Impact</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #E84196;"></div>
+                        <span>Second Order Impact</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #41D5E8;"></div>
+                        <span>Third Order Impact</span>
+                    </div>
+                </div>
             </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #E8D541;"></div>
-                <span>First Order Impact</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #E84196;"></div>
-                <span>Second Order Impact</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #41D5E8;"></div>
-                <span>Third Order Impact</span>
-            </div>
-        </div>
 
-        <div class="info-panel" id="infoPanel">
-            <h3>Instructions</h3>
-            <p>Click on any node to explore its details. Drag to pan, scroll to zoom.</p>
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-content">
+                    <h3>Select a Node</h3>
+                    <div class="level-badge level-0">Instructions</div>
+                    <div class="description">
+                        <h4>How to use:</h4>
+                        <p>Click on any node in the visualization to see its title and detailed description here. The nodes show short titles, and full descriptions appear in this sidebar.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="tooltip" id="tooltip"></div>
 
-    <script src="futures-wheel-optimized.js?v=6"></script>
+    <script src="futures-wheel-optimized.js?v=14"></script>
 </body>
 </html>

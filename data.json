@@ -1,0 +1,273 @@
+{
+  "center": {
+    "id": "center",
+    "title": "Rutiinikontaktit siirtyvät roboteille",
+    "description": "Keskeinen ilmiö, jossa rutiinimaiset potilaskontaktit siirtyvät automaattisille järjestelmille, boteille ja roboteille. Tämä muutos vaikuttaa perustavanlaatuisesti terveydenhuollon toimintatapoihin ja ammattilaisten työtehtäviin.",
+    "level": 0
+  },
+  "impacts": {
+    "1": [
+      {
+        "title": "Kasvokkainen vuorovaikutus vähenee",
+        "description": "Potilaiden ja ammattilaisten välinen suora kasvokkainen vuorovaikutus vähenee merkittävästi, kun rutiinikontaktit siirtyvät digitaalisille alustoille ja automaattisille järjestelmille."
+      },
+      {
+        "title": "Ammattilaisen autonomia kaventuu",
+        "description": "Ammattilaisten päätöksentekovapaus ja autonomia kaventuu, kun järjestelmät ohjaavat ja rajoittavat toimintaa ennalta määriteltyjen protokollien ja algoritmien mukaan."
+      },
+      {
+        "title": "Työnkuvaksi järjestelmien valvonta",
+        "description": "Ammattilaisten työnkuva muuttuu perustavanlaatuisesti: heidän tehtävänsä kääntyy potilashoidosta järjestelmien valvontaan, poikkeamien käsittelyyn ja laiteympäristön ylläpitoon."
+      },
+      {
+        "title": "Virheprofiili muuttuu",
+        "description": "Virheiden luonne muuttuu: inhimilliset virheet vähenevät, mutta mallivirheiden, integraatiovirheiden ja järjestelmäriippuvuuksien riski kasvaa merkittävästi."
+      },
+      {
+        "title": "Päätöksenteko data-ohjautuvaa",
+        "description": "Organisaation päätöksenteko muuttuu entistä enemmän data-ohjautuvaksi, jossa mittarit, algoritmit ja automaattiset raportit ohjaavat strategisia ja operatiivisia päätöksiä."
+      }
+    ],
+    "2": [
+      {
+        "title": "Hoidon jatkuvuus heikkenee",
+        "description": "Potilashoidon jatkuvuus heikkenee, kun henkilökohtainen yhteys ammattilaisen ja potilaan välillä katkeaa ja hoito perustuu enemmän järjestelmäpohjaiseen seurantaan."
+      },
+      {
+        "title": "Vähenevä potilaskontakti",
+        "description": "Henkilöstö, joka siirtyy järjestelmien valvontaan, menettää suoran kontaktin potilaiden kanssa, mikä vaikuttaa heidän ammattitaitoihinsa ja työn merkityksellisyyteen."
+      },
+      {
+        "title": "Yksinäisyyden ja vieraantumisen kasvu",
+        "description": "Sekä potilaat että ammattilaiset kokevat lisääntyvää yksinäisyyttä ja vieraantumista, kun inhimillinen vuorovaikutus korvautuu teknologisilla ratkaisuilla."
+      },
+      {
+        "title": "Työn sisältö standardoituu",
+        "description": "Ammattilaisten työn sisältö standardoituu ja menettää luovuuttaan, kun toimintatavat määräytyvät ennalta määriteltyjen protokollien ja algoritmien mukaan."
+      },
+      {
+        "title": "Moraalinen stressi kasvaa",
+        "description": "Ammattilaisten moraalinen stressi kasvaa, kun heidän on tehtävä päätöksiä järjestelmien ohjaamana, mikä voi olla ristiriidassa heidän ammattietiikkansa kanssa."
+      },
+      {
+        "title": "Varman päälle pelaaminen",
+        "description": "Sanktioriskit ja vastuullisuus ohjaavat ammattilaisia tekemään varmoja, konservatiivisia päätöksiä, mikä voi hidastaa innovaatiota ja parantaa hoitotuloksia."
+      },
+      {
+        "title": "Hälytykset rytmittävät työn",
+        "description": "Ammattilaisten päivittäinen työ rytmittyy järjestelmien hälytysten ja poikkeamien käsittelyn ympärille, mikä muuttaa työn luonnetta reagoivaksi."
+      },
+      {
+        "title": "Vianetsintätaidot tärkeitä",
+        "description": "Vianetsintätaidot ja järjestelmäongelmien ratkaiseminen tulevat arkipäiväisiksi taitoiksi, kun teknologia on keskeisessä asemassa hoidon toteutuksessa."
+      },
+      {
+        "title": "Hiljaiset taidot rapautuu",
+        "description": "Hiljaisten, kokemuksen kautta hankittujen taitojen rapautumisen riski kasvaa, kun järjestelmät korvaavat intuitiivisen ammattitiedon."
+      },
+      {
+        "title": "Systeemivirheiden kasvu",
+        "description": "Syntyy harvinaisia, mutta laajavaikutteisia systeemivirheitä, jotka voivat vaikuttaa suureen määrään potilaita samanaikaisesti."
+      },
+      {
+        "title": "Väärin koulutetut mallit",
+        "description": "Koneoppimismallit, jotka on koulutettu vääriin tai puutteellisiin dataoletuksiin, voivat tuottaa virheellisiä suosituksia ja päätöksiä."
+      },
+      {
+        "title": "Koulutuksissa painottuu mallit",
+        "description": "Ammattilaisten koulutus painottuu entistä enemmän tunnistamaan ja ymmärtämään koneoppimismallien rajoitteita ja virhelähteitä."
+      },
+      {
+        "title": "Mittarista tulee tavoite",
+        "description": "Goodhartin laki toteutuu: kun mittareista tulee tavoitteita, ne menettävät kyvyn mitata todellista laatua ja tuloksia."
+      },
+      {
+        "title": "Gaming ja osaoptimointi lisääntyvät",
+        "description": "Ammattilaisten gaming ja osaoptimointi lisääntyvät, kun heidän suorituksensa mitataan ennalta määriteltyjen mittareiden mukaan."
+      },
+      {
+        "title": "Johtamiskulttuuri muuttuu",
+        "description": "Organisaation johtamiskulttuuri muuttuu teknologia-ohjaiseksi, jossa data ja algoritmit ohjaavat strategisia päätöksiä."
+      }
+    ],
+    "3": [
+      {
+        "title": "Potilaan luottamus muuttuu",
+        "description": "Potilaiden luottamus ammattilaisiin muuttuu, kun heidän suhteensa on enemmän järjestelmään kuin henkilökohtaiseen ammattilaiseen."
+      },
+      {
+        "title": "Hiljainen konteksti katoaa",
+        "description": "Henkilökohtaisen taustatiedon ja kontekstin hiljainen ymmärrys katoaa, kun hoito perustuu enemmän standardoituihin protokolliin."
+      },
+      {
+        "title": "Hoitomyöntyvyys laskee osalla",
+        "description": "Osalla potilaista hoitomyöntyvyys laskee, kun he eivät tunne saavansa henkilökohtaista huomiota ja hoitoa."
+      },
+      {
+        "title": "Kliininen intuitio korvautuu",
+        "description": "Ammattilaisten kliininen intuitio ja kokemusperäinen tieto korvautuu mittari- ja hälytysperusteisella päätöksenteolla."
+      },
+      {
+        "title": "Ammatti-identiteetti muuttuu",
+        "description": "Ammattilaisten ammattiylpeys ja ammatti-identiteetti muuttuvat, kun heidän roolinsa muuttuu järjestelmien valvojiksi."
+      },
+      {
+        "title": "Robottien häiriössä ei osaamista",
+        "description": "Kriittisissä häiriötilanteissa, kun robotit ja automaattiset järjestelmät eivät toimi, kenelläkään ei ole riittävää osaamista toimia manuaalisesti."
+      },
+      {
+        "title": "Halu hakeutua hoitoon pienenee",
+        "description": "Osalla potilaista halu hakeutua hoitoon pienenee, kun he eivät tunne saavansa henkilökohtaista huomiota ja hoitoa."
+      },
+      {
+        "title": "Oireita ei haluta jakaa",
+        "description": "Potilaat eivät halua jakaa henkilökohtaisia oireitaan ja kokemuksiaan järjestelmien kanssa, mikä vaikeuttaa diagnostiikkaa."
+      },
+      {
+        "title": "Yksinäisyyden tilanne hankaloituu",
+        "description": "Yksinäisyys, joka on jo valmiiksi haastava ongelma, hankaloituu entisestään, kun inhimillinen vuorovaikutus vähenee."
+      },
+      {
+        "title": "Työn merkityksellisyys kärsii",
+        "description": "Ammattilaisten ammattiylpeys ja työn merkityksellisyyden tunne voivat kärsiä, kun heidän roolinsa muuttuu järjestelmien valvojiksi."
+      },
+      {
+        "title": "Potilaiden monimutkaiset tilanteet kärsivät",
+        "description": "Potilaiden monimutkaiset ja yksilölliset tilanteet kärsivät, kun hoito standardoituu ja menettää henkilökohtaisen lähestymistavan."
+      },
+      {
+        "title": "Ammattikuntien välinen erottautuminen",
+        "description": "Eri ammattikuntien välinen erottautuminen ja erikoistuminen hämärtyy, kun kaikki työskentelevät järjestelmien kanssa."
+      },
+      {
+        "title": "Uupumus ja vaihtuvuus lisääntyvät",
+        "description": "Ammattilaisten uupumus ja vaihtuvuus lisääntyvät, kun työn merkityksellisyys ja henkilökohtainen tyytyväisyys vähenevät."
+      },
+      {
+        "title": "Potilaan ja ammattilaisen suhde jännittyy",
+        "description": "Potilaan ja ammattilaisen välinen suhde jännittyy, kun teknologia tulee heidän väliinsä ja muuttaa vuorovaikutuksen luonnetta."
+      },
+      {
+        "title": "Epävirallisia kiertoreittejä syntyy",
+        "description": "Syntyy epävirallisia kiertoreittejä ja työmenetelmiä, kun ammattilaiset yrittävät säilyttää henkilökohtaisen lähestymistavan."
+      },
+      {
+        "title": "Uusien hoitomuotojen kehittyminen hidastuu",
+        "description": "Uusien ja innovatiivisten hoitomuotojen kehittyminen hidastuu, kun järjestelmät standardoivat toimintatapoja."
+      },
+      {
+        "title": "Potilasturvallisuus paranee",
+        "description": "Potilasturvallisuus paranee systemaattisten protokollien ja automaattisten tarkistusten ansiosta."
+      },
+      {
+        "title": "Potilaat eivät saa uusimpia hoitoja",
+        "description": "Potilaat eivät välttämättä saa uusimpia ja parhaita hoitoja, jos nämä eivät ole mukana järjestelmien protokollissa."
+      },
+      {
+        "title": "Hälytysväsymys lisääntyy",
+        "description": "Ammattilaisten hälytysväsymys lisääntyy, kun he saavat jatkuvasti hälytyksiä järjestelmiltä."
+      },
+      {
+        "title": "Vääriä positiivisia suodatetaan aggressiivisemmin",
+        "description": "Vääriä positiivisia tuloksia suodatetaan aggressiivisemmin, kun järjestelmät pyrkivät minimoimaan virheet."
+      },
+      {
+        "title": "Priorisointimatriisit standardoidaan",
+        "description": "Potilaiden priorisointi ja hoitotarpeiden arviointi standardoidaan algoritmien ja matriisien mukaan."
+      },
+      {
+        "title": "Cross-skilling lisääntyy",
+        "description": "Ammattilaisten cross-skilling ja monitaitoinen työskentely lisääntyy, kun heidän on osattava työskennellä eri järjestelmien kanssa."
+      },
+      {
+        "title": "Osaaminen sidotaan järjestelmätasoihin",
+        "description": "Henkilöstön osaamiskartoitus ja kehittäminen sidotaan järjestelmätasoihin ja teknologisiin vaatimuksiin."
+      },
+      {
+        "title": "Motivaatioprofiili muuttuu",
+        "description": "Ammattilaisten motivaatioprofiili muuttuu, kun työn luonne ja merkityksellisyys muuttuvat teknologia-ohjaiseksi."
+      },
+      {
+        "title": "Luottamuksen rakentaminen vaikeutuu",
+        "description": "Potilaiden ja ammattilaisten välisen luottamuksen rakentaminen vaikeutuu, kun teknologia tulee heidän väliinsä."
+      },
+      {
+        "title": "Inhimillisyyden kokemus heikkenee",
+        "description": "Potilaiden kokema inhimillisyys ja henkilökohtainen huomio heikkenee, kun hoito standardoituu."
+      },
+      {
+        "title": "Organisaatiokulttuuri siirtyy tekniseen tehokkuuteen",
+        "description": "Organisaation kulttuuri siirtyy tekniseen tehokkuuteen ja mittari-ohjautuvuuteen henkilökohtaisen hoidon sijaan."
+      },
+      {
+        "title": "Single-point-of-failure -kohtien kartoittaminen",
+        "description": "Organisaation on kartoittava ja hallittava single-point-of-failure -kohtia, jotka voivat aiheuttaa laajamittaisia häiriöitä."
+      },
+      {
+        "title": "Pakolliset tappokytkimet standardoidaan",
+        "description": "Kriittisten tilanteiden tappokytkimet ja hätätoimenpiteet standardoidaan ja automatisoituvat."
+      },
+      {
+        "title": "Syntyy uudenlaisia potilasturvallisuusongelmia",
+        "description": "Syntyy uudenlaisia potilasturvallisuusongelmia, jotka liittyvät järjestelmäriippuvuuteen ja teknologisiin virheisiin."
+      },
+      {
+        "title": "Hoitotulokset heikkenevät aliedustetuissa ryhmissä",
+        "description": "Hoitotulokset heikkenevät aliedustetuissa potilasryhmissä, jotka eivät ole hyvin edustettuina koulutusdatassa."
+      },
+      {
+        "title": "Juridiset riskit kasvavat",
+        "description": "Organisaation juridiset riskit kasvavat, kun päätökset tehdään algoritmien ja järjestelmien ohjaamana."
+      },
+      {
+        "title": "Opetussuunnitelmiin lisätään mallin rajoitteet",
+        "description": "Ammattikoulutuksen opetussuunnitelmiin lisätään koneoppimismallien rajoitteiden ja virhelähteiden tunnistaminen."
+      },
+      {
+        "title": "Sertifiointi/uusintatesti säännöllisesti",
+        "description": "Ammattilaisten sertifiointi ja uusintatestit tulevat säännöllisiksi, jotta he pysyvät ajan tasalla järjestelmien muutoksista."
+      },
+      {
+        "title": "Koulutus kattaa järjestelmäriippuvuudet",
+        "description": "Ammattilaisten koulutus kattaa järjestelmäriippuvuudet ja teknologiset riskit, jotta he osaavat toimia häiriötilanteissa."
+      },
+      {
+        "title": "Mittari paranee ilman todellista hoidon kohentumista",
+        "description": "Mittarit voivat parantua ilman todellista hoidon laadun kohentumista, kun järjestelmät optimoivat mittareita."
+      },
+      {
+        "title": "Hoito kohdistuu mitattaviin asioihin",
+        "description": "Hoito kohdistuu enemmän mitattaviin ja kvantifioitaviin asioihin, kun laadulliset ja henkilökohtaiset näkökulmat jäävät vähemmälle huomiolle."
+      },
+      {
+        "title": "Vaikeat potilaat valikoituvat ulos",
+        "description": "Vaikeat ja monimutkaiset potilaat voivat valikoitua ulos hoidosta, jos he eivät sovi järjestelmien protokolliin."
+      },
+      {
+        "title": "Tiimit optimoivat omia lukujaan",
+        "description": "Tiimit optimoivat omia suorituslukujaan mittareiden mukaan, mikä voi olla ristiriidassa potilaiden parhaan edun kanssa."
+      },
+      {
+        "title": "Yksiköt kieltäytyvät ottamasta korkeariskisiä potilaita",
+        "description": "Yksiköt voivat kieltäytyä ottamasta korkeariskisiä potilaita, jos nämä vaikuttavat negatiivisesti heidän suorituslukuihinsa."
+      },
+      {
+        "title": "Asiakaskokemus heikkenee",
+        "description": "Potilaiden asiakaskokemus heikkenee, kun henkilökohtainen huomio ja hoito korvautuvat standardoidulla prosessilla."
+      },
+      {
+        "title": "Standardit prosessit sujuvoittavat arkea",
+        "description": "Standardoidut prosessit sujuvoittavat ammattilaisten arkea ja vähentävät byrokratiaa."
+      },
+      {
+        "title": "Kokeilukulttuuri vahvistuu",
+        "description": "Organisaation kokeilukulttuuri ja innovaatio vahvistuvat, kun teknologia mahdollistaa nopean testaamisen ja iteraation."
+      },
+      {
+        "title": "Resilienssi paranee",
+        "description": "Organisaation resilienssi ja kyky selviytyä häiriöistä paranee systemaattisten protokollien ja automaation ansiosta."
+      }
+    ]
+  }
+}
+
